@@ -1,0 +1,66 @@
+{% extends "navbar.html" %}
+{% block body %}
+
+<div class="container">
+    <h1>Title: {{post.title}}</h1>
+    <p>Content: {{post.content}}</p>
+    <p>Written by: {{post.author}}</p>
+    <div class="mb-3">
+        Files:
+            {% if post.file %}
+            <a href="{% url 'download_file' id=post.id %}">{{ post.file.name }}</a>
+            {% else %}
+                No file attached.
+            {% endif %}
+    </div>
+    <form action="{% url 'home' %}" class="mb-5">
+      <button class="btn btn-md btn-info text-white">Back to all posts</button>
+    </form>
+
+    {% if user.is_authenticated %}
+    <form class="row" method="POST" action="{% url 'Comment' id=post.id %}">
+        {% csrf_token %}
+      <div class="col-md-6">
+          <h3>Enter a new comment: </h3>
+          <div class="mb-3">
+              <label for="comment" class="form-label">Your comment: </label>
+              <textarea class="form-control" name="comment" id="comment" cols="30" rows="10"></textarea>
+          </div>
+          <button type="submit" class="btn btn-primary">Submit</button>
+      </div>
+    </form>
+    {% endif %}
+    {% if comments.exists %}
+        <div class="comments mt-5">
+            <h3>Comments</h3>
+            <div>
+                {% for comment in comments %}
+                    <div class="mb-3">
+                        <div class="d-flex align-items-center">
+                            <div class="w-100 bg-secondary-subtle p-3 ml-0">
+                                <p class="m-0"><a href="{% url 'UserProfileInfo' username=comment.author_post.username %}" class="text-decoration-none">{{comment.author_post}}</a></p>
+                                <p class="m-0">{{ comment.content_comment }}</p>
+                                <div class="d-flex align-items-center justify-content-between">
+                                    <p class="m-0">Posted: {{comment.date_created}}</p>
+                                    {% if user.is_authenticated and request.user == comment.author_post or request.user == post.author or request.user.is_superuser %}
+                                    <form action="{% url 'DeleteComment'  postid=comment.blog_post.id commentid=comment.id %}" method="post">
+                                        {% csrf_token %}
+                                        <button class="btn btn-sm btn-danger ml-auto">Delete comment</button>
+                                    </form>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+    {% else %}
+        <div class="comments mt-5">
+            <h3>Comments</h3>
+            <p>There are not any comments.</p>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+{% endblock %}

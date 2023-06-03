@@ -1,0 +1,13 @@
+{% extends 'navbar.html' %}
+
+{% block body %}
+    <h1 class="text-center">Edit info</h1>
+<div class="container">
+    <form action="{% url 'EditInfoPage' username=user.username %}" enctype="multipart/form-data" method="post">
+        {% csrf_token %}
+        {{form2.as_p}}
+        {{form.as_p}}
+    <button class="btn btn-sm btn-success">Update profile</button>
+    </form>
+</div>
+{% endblock %}
